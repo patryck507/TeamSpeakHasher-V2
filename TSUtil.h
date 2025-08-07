@@ -64,8 +64,8 @@ public:
 
     SHA256_CTX ctx;
     sha256_init(&ctx);
-    sha256_update(&ctx, reinterpret_cast<const BYTE*>(hashinput.data()), hashinput.size());
-    BYTE hash[SHA256_BLOCK_SIZE];
+    sha256_update(&ctx, reinterpret_cast<const uint8_t*>(hashinput.data()), hashinput.size());
+    uint8_t hash[SHA256_BLOCK_SIZE];
     sha256_final(&ctx, hash);
 
     uint8_t zerobytes = 0;
