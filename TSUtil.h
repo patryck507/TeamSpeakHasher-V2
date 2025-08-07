@@ -56,8 +56,11 @@ public:
     return counterlen < 20 ? (powlong(10, counterlen) - counter) : UINT64_MAX;
   }
 
-  static uint8_t getDifficulty(std::string publickey, uint64_t counter) {
-    std::string hashinput = publickey + std::to_string(counter);
+  static uint8_t getDifficulty(const std::string& publickey, uint64_t counter) {
+    std::string hashinput;
+    hashinput.reserve(publickey.size() + 20);
+    hashinput.append(publickey);
+    hashinput.append(std::to_string(counter));
 
     SHA1 ctx;
     ctx.update(hashinput);

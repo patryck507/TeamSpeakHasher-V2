@@ -83,7 +83,7 @@ DeviceContext::DeviceContext(std::string device_name,
 void DeviceContext::measureTime() {
   auto currenttime = std::chrono::high_resolution_clock::now();
   if (timer_started) {
-    auto timeidx = timecounter % NUM_TIME_MEASURMENTS;
+    auto timeidx = timecounter & (NUM_TIME_MEASURMENTS - 1);
     recenttimes[timeidx] = currenttime - laststarttime;
     recentiterations[timeidx] = lastschedulediterations_total;
     timecounter++;

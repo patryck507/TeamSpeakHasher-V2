@@ -511,18 +511,24 @@ void TSHasherContext::run_kernel_loop(DeviceContext* dev_ctx) {
     const size_t identity_length = dev_ctx->identitystring.size();
     cl::Kernel& kernel = TSUtil::isSlowPhase(identity_length, dev_ctx->tshasherctx->startcounter) ? dev_ctx->kernel2 : dev_ctx->kernel;
 
-    dev_ctx->tshasherctx->startcounter_mutex.lock();
-    auto dev_startcounter = dev_ctx->tshasherctx->startcounter;
-    auto global_max_iterations = std::min((uint64_t)dev_ctx->global_work_size * KERNEL_STD_ITERATIONS, TSUtil::itsConstantCounterLength(dev_startcounter));
-    const uint64_t iterations = global_max_iterations / dev_ctx->global_work_size;
-    if (iterations == 0) {
-      // if there are too few iterations until the counter length increases, we just skip these
-      dev_ctx->tshasherctx->startcounter += global_max_iterations;
-      dev_ctx->tshasherctx->startcounter_mutex.unlock();
-      continue;
+    uint64_t iterations = 0;
+    uint64_t iteration_total = 0;
+    {
+      std::lock_guard<std::mutex> lock(dev_ctx->tshasherctx->startcounter_mutex);
+      auto dev_startcounter = dev_ctx->tshasherctx->startcounter;
+      auto global_max_iterations = std::min((uint64_t)dev_ctx->global_work_size * KERNEL_STD_ITERATIONS,
+                                            TSUtil::itsConstantCounterLength(dev_startcounter));
+      iterations = global_max_iterations / dev_ctx->global_work_size;
+      if (iterations == 0) {
+        dev_ctx->tshasherctx->startcounter += global_max_iterations;
+        continue;
+      }
+      iteration_total = static_cast<uint64_t>(dev_ctx->global_work_size) * iterations;
+      dev_ctx->lastscheduled_startcounter = dev_ctx->tshasherctx->startcounter;
+      dev_ctx->tshasherctx->startcounter += iteration_total;
     }
     cl_int err;
-    err = kernel.setArg(0, (cl_ulong)dev_ctx->tshasherctx->startcounter);
+    err = kernel.setArg(0, (cl_ulong)dev_ctx->lastscheduled_startcounter);
     err |= kernel.setArg(1, (cl_uint)iterations);
     const uint8_t bestdifficulty = std::max(dev_ctx->tshasherctx->global_bestdifficulty, dev_ctx->bestdifficulty);
     const uint8_t targetdifficulty = std::max(dev_ctx->tshasherctx->MIN_TARGET_DIFFICULTY, (uint8_t)(1 + bestdifficulty));
@@ -538,12 +544,8 @@ void TSHasherContext::run_kernel_loop(DeviceContext* dev_ctx) {
 
     dev_ctx->measureTime();
 
-
-    dev_ctx->lastscheduled_startcounter = dev_ctx->tshasherctx->startcounter;
-    dev_ctx->tshasherctx->startcounter += static_cast<uint64_t>(dev_ctx->global_work_size) * iterations;
-    dev_ctx->tshasherctx->startcounter_mutex.unlock();
-    dev_ctx->schedulediterations_total += static_cast<uint64_t>(dev_ctx->global_work_size) * iterations;
-    dev_ctx->lastschedulediterations_total = static_cast<uint64_t>(dev_ctx->global_work_size) * iterations;
+    dev_ctx->schedulediterations_total += iteration_total;
+    dev_ctx->lastschedulediterations_total = iteration_total;
 
 
     err = dev_ctx->command_queue.enqueueNDRangeKernel(kernel, cl::NullRange,
@@ -597,9 +599,8 @@ void TSHasherContext::read_kernel_result(DeviceContext* dev_ctx) {
       uint8_t bestdifficulty = 0;
       uint64_t bestdifficulty_counter = 0;
 
-      for (uint64_t counter = searchstartcounter;
-        counter < searchstartcounter + its_per_worker;
-        counter++) {
+      const uint64_t searchend = searchstartcounter + its_per_worker;
+      for (uint64_t counter = searchstartcounter; counter < searchend; ++counter) {
         uint8_t currentdifficulty = TSUtil::getDifficulty(dev_ctx->identitystring, counter);
         if (currentdifficulty > bestdifficulty) {
           bestdifficulty = currentdifficulty;
