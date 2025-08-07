@@ -1,5 +1,9 @@
 /*********************************************************************
+
 * Filename:   sha256.cpp
+
+* Filename:   sha256.c
+
 * Author:     Brad Conte (brad AT bradconte.com)
 * Copyright:
 * Disclaimer: This code is presented "as is" without any guarantees.
@@ -29,7 +33,11 @@
 #define SIG1(x) (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
 
 /**************************** VARIABLES *****************************/
+
 static const uint32_t k[64] = {
+
+static const WORD k[64] = {
+
 	0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
 	0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
 	0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
@@ -41,9 +49,15 @@ static const uint32_t k[64] = {
 };
 
 /*********************** FUNCTION DEFINITIONS ***********************/
+
 static void sha256_transform(SHA256_CTX *ctx, const uint8_t data[])
 {
         uint32_t a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
+
+static void sha256_transform(SHA256_CTX *ctx, const BYTE data[])
+{
+	WORD a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
+
 
 	for (i = 0, j = 0; i < 16; ++i, j += 4)
 		m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
@@ -96,9 +110,15 @@ void sha256_init(SHA256_CTX *ctx)
 	ctx->state[7] = 0x5be0cd19;
 }
 
+
 void sha256_update(SHA256_CTX *ctx, const uint8_t data[], size_t len)
 {
         uint32_t i;
+
+void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len)
+{
+	WORD i;
+
 
 	for (i = 0; i < len; ++i) {
 		ctx->data[ctx->datalen] = data[i];
@@ -111,9 +131,15 @@ void sha256_update(SHA256_CTX *ctx, const uint8_t data[], size_t len)
 	}
 }
 
+
 void sha256_final(SHA256_CTX *ctx, uint8_t hash[])
 {
         uint32_t i;
+
+void sha256_final(SHA256_CTX *ctx, BYTE hash[])
+{
+	WORD i;
+
 
 	i = ctx->datalen;
 
@@ -133,6 +159,7 @@ void sha256_final(SHA256_CTX *ctx, uint8_t hash[])
 
 	// Append to the padding the total message's length in bits and transform.
 	ctx->bitlen += ctx->datalen * 8;
+
         ctx->data[63] = static_cast<uint8_t>(ctx->bitlen);
         ctx->data[62] = static_cast<uint8_t>(ctx->bitlen >> 8);
         ctx->data[61] = static_cast<uint8_t>(ctx->bitlen >> 16);
@@ -141,6 +168,16 @@ void sha256_final(SHA256_CTX *ctx, uint8_t hash[])
         ctx->data[58] = static_cast<uint8_t>(ctx->bitlen >> 40);
         ctx->data[57] = static_cast<uint8_t>(ctx->bitlen >> 48);
         ctx->data[56] = static_cast<uint8_t>(ctx->bitlen >> 56);
+
+	ctx->data[63] = ctx->bitlen;
+	ctx->data[62] = ctx->bitlen >> 8;
+	ctx->data[61] = ctx->bitlen >> 16;
+	ctx->data[60] = ctx->bitlen >> 24;
+	ctx->data[59] = ctx->bitlen >> 32;
+	ctx->data[58] = ctx->bitlen >> 40;
+	ctx->data[57] = ctx->bitlen >> 48;
+	ctx->data[56] = ctx->bitlen >> 56;
+
 	sha256_transform(ctx, ctx->data);
 
 	// Since this implementation uses little endian byte ordering and SHA uses big endian,
