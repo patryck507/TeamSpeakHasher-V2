@@ -1,5 +1,5 @@
 /*********************************************************************
-* Filename:   sha256.c
+* Filename:   sha256.cpp
 * Author:     Brad Conte (brad AT bradconte.com)
 * Copyright:
 * Disclaimer: This code is presented "as is" without any guarantees.
@@ -13,7 +13,6 @@
 *********************************************************************/
 
 /*************************** HEADER FILES ***************************/
-#include <cstdlib>
 #include <cstring>
 #include "sha256.h"
 
