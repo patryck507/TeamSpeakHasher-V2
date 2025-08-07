@@ -40,7 +40,6 @@ SOFTWARE.
 #include "Config.h"
 #include "DeviceContext.h"
 #include "Kernel.h"
-#include "sha1.h"
 #include "Table.h"
 #include "TSUtil.h"
 #include "TimerKiller.h"

@@ -22,7 +22,7 @@ SOFTWARE.
 #ifndef TSUTIL_H_
 #define TSUTIL_H_
 
-#include "sha1.h"
+#include "sha256.h"
 
 #include <cstdint>
 #include <string>
@@ -58,20 +58,22 @@ public:
 
   static uint8_t getDifficulty(const std::string& publickey, uint64_t counter) {
     std::string hashinput;
-    hashinput.reserve(publickey.size() + 20);
+    hashinput.reserve(publickey.size() + 32);
     hashinput.append(publickey);
     hashinput.append(std::to_string(counter));
 
-    SHA1 ctx;
-    ctx.update(hashinput);
-    std::vector<uint8_t> hash = ctx.final();
+    SHA256_CTX ctx;
+    sha256_init(&ctx);
+    sha256_update(&ctx, reinterpret_cast<const uint8_t*>(hashinput.data()), hashinput.size());
+    uint8_t hash[SHA256_BLOCK_SIZE];
+    sha256_final(&ctx, hash);
 
     uint8_t zerobytes = 0;
-    while (zerobytes < 20 && hash[zerobytes] == 0) {
+    while (zerobytes < SHA256_BLOCK_SIZE && hash[zerobytes] == 0) {
       zerobytes++;
     }
     uint8_t zerobits = 0;
-    if (zerobytes < 20) {
+    if (zerobytes < SHA256_BLOCK_SIZE) {
       uint8_t lastbyte = hash[zerobytes];
       while ((lastbyte & 1) == 0) {
         zerobits++;
