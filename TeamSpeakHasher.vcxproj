@@ -144,7 +144,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="DeviceContext.h" />
     <ClInclude Include="IdentityProgress.h" />
-    <ClInclude Include="sha256.h" />
+    <ClInclude Include="sha1.h" />
     <ClInclude Include="Table.h" />
     <ClInclude Include="TimerKiller.h" />
     <ClInclude Include="TSHasherContext.h" />
@@ -156,7 +156,7 @@
     <ClCompile Include="DeviceContext.cpp" />
     <ClCompile Include="IdentityProgress.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="sha256.cpp" />
+    <ClCompile Include="sha1.cpp" />
     <ClCompile Include="TSHasherContext.cpp" />
     <ClCompile Include="TunedParameters.cpp" />
   </ItemGroup>

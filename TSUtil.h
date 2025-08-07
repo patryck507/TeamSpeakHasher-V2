@@ -22,7 +22,7 @@ SOFTWARE.
 #ifndef TSUTIL_H_
 #define TSUTIL_H_
 
-#include "sha256.h"
+#include "sha1.h"
 
 #include <cstdint>
 #include <string>
@@ -62,18 +62,18 @@ public:
     hashinput.append(publickey);
     hashinput.append(std::to_string(counter));
 
-    SHA256_CTX ctx;
-    sha256_init(&ctx);
-    sha256_update(&ctx, reinterpret_cast<const uint8_t*>(hashinput.data()), hashinput.size());
-    uint8_t hash[SHA256_BLOCK_SIZE];
-    sha256_final(&ctx, hash);
+    SHA1_CTX ctx;
+    sha1_init(&ctx);
+    sha1_update(&ctx, reinterpret_cast<const uint8_t*>(hashinput.data()), hashinput.size());
+    uint8_t hash[SHA1_BLOCK_SIZE];
+    sha1_final(&ctx, hash);
 
     uint8_t zerobytes = 0;
-    while (zerobytes < SHA256_BLOCK_SIZE && hash[zerobytes] == 0) {
+    while (zerobytes < SHA1_BLOCK_SIZE && hash[zerobytes] == 0) {
       zerobytes++;
     }
     uint8_t zerobits = 0;
-    if (zerobytes < SHA256_BLOCK_SIZE) {
+    if (zerobytes < SHA1_BLOCK_SIZE) {
       uint8_t lastbyte = hash[zerobytes];
       while ((lastbyte & 1) == 0) {
         zerobits++;

@@ -5,7 +5,7 @@ CXXFLAGS := -std=c++11 -Wall -Iinclude
 
 LDLIBS=-lOpenCL -lpthread
 
-srcfiles = sha256.cpp IdentityProgress.cpp TunedParameters.cpp Config.cpp DeviceContext.cpp TSHasherContext.cpp main.cpp
+srcfiles = sha1.cpp IdentityProgress.cpp TunedParameters.cpp Config.cpp DeviceContext.cpp TSHasherContext.cpp main.cpp
 objects := $(patsubst %.cpp, %.o, $(srcfiles))
 
 

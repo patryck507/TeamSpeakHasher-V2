@@ -24,7 +24,7 @@
     <ClInclude Include="TSHasherContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sha256.h">
+    <ClInclude Include="sha1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Config.h">
@@ -47,7 +47,7 @@
     <ClCompile Include="TSHasherContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sha256.cpp">
+    <ClCompile Include="sha1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
