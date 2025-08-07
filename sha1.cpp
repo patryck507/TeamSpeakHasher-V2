@@ -18,9 +18,9 @@
 #define ROTLEFT(a, b) ((a << b) | (a >> (32 - b)))
 
 /*********************** FUNCTION DEFINITIONS ***********************/
-void sha1_transform(SHA1_CTX *ctx, const BYTE data[])
+void sha1_transform(SHA1_CTX *ctx, const uint8_t data[])
 {
-	WORD a, b, c, d, e, i, j, t, m[80];
+        uint32_t a, b, c, d, e, i, j, t, m[80];
 
 	for (i = 0, j = 0; i < 16; ++i, j += 4)
 		m[i] = (data[j] << 24) + (data[j + 1] << 16) + (data[j + 2] << 8) + (data[j + 3]);
@@ -90,7 +90,7 @@ void sha1_init(SHA1_CTX *ctx)
 	ctx->k[3] = 0xca62c1d6;
 }
 
-void sha1_update(SHA1_CTX *ctx, const BYTE data[], size_t len)
+void sha1_update(SHA1_CTX *ctx, const uint8_t data[], size_t len)
 {
 	size_t i;
 
@@ -105,9 +105,9 @@ void sha1_update(SHA1_CTX *ctx, const BYTE data[], size_t len)
 	}
 }
 
-void sha1_final(SHA1_CTX *ctx, BYTE hash[])
+void sha1_final(SHA1_CTX *ctx, uint8_t hash[])
 {
-	WORD i;
+        uint32_t i;
 
 	i = ctx->datalen;
 
@@ -127,14 +127,14 @@ void sha1_final(SHA1_CTX *ctx, BYTE hash[])
 
 	// Append to the padding the total message's length in bits and transform.
 	ctx->bitlen += ctx->datalen * 8;
-	ctx->data[63] = ctx->bitlen;
-	ctx->data[62] = ctx->bitlen >> 8;
-	ctx->data[61] = ctx->bitlen >> 16;
-	ctx->data[60] = ctx->bitlen >> 24;
-	ctx->data[59] = ctx->bitlen >> 32;
-	ctx->data[58] = ctx->bitlen >> 40;
-	ctx->data[57] = ctx->bitlen >> 48;
-	ctx->data[56] = ctx->bitlen >> 56;
+        ctx->data[63] = (uint8_t)(ctx->bitlen);
+        ctx->data[62] = (uint8_t)(ctx->bitlen >> 8);
+        ctx->data[61] = (uint8_t)(ctx->bitlen >> 16);
+        ctx->data[60] = (uint8_t)(ctx->bitlen >> 24);
+        ctx->data[59] = (uint8_t)(ctx->bitlen >> 32);
+        ctx->data[58] = (uint8_t)(ctx->bitlen >> 40);
+        ctx->data[57] = (uint8_t)(ctx->bitlen >> 48);
+        ctx->data[56] = (uint8_t)(ctx->bitlen >> 56);
 	sha1_transform(ctx, ctx->data);
 
 	// Since this implementation uses little endian byte ordering and MD uses big endian,
