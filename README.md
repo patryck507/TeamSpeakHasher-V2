@@ -1,6 +1,6 @@
 # TeamSpeakHasher
 
-TeamSpeakHasher is an OpenCL-based tool that can be used to increase the security level of TeamSpeak identities with unprecedented performance and efficiency.
+TeamSpeakHasher is now a CUDA-based tool that can be used to increase the security level of TeamSpeak identities with unprecedented performance and efficiency. The CUDA implementation employs shared memory and constant memory to optimize hashing throughput.
 
 ## Download
 GitHub Actions automatically builds each commit.
@@ -9,15 +9,14 @@ To download the latest build, go to the **Actions** tab, choose the desired OS i
 
 ## Build Instructions
 ### Linux
-1. Make sure you have the OpenCL headers and libraries set up properly on your system.
-2. Use the provided `Makefile` to build: `make all`
+1. Ensure that the NVIDIA CUDA Toolkit is installed and `nvcc` is available in your path.
+2. Use the provided `Makefile` to build: `make`
 3. Enjoy.
 
 ### Windows
-1. Make sure to have the environment variables `OPENCL_LIB_WIN32` and `OPENCL_LIB_WIN64` set to the directories of the 32-bit and 64-bit `OpenCL.lib` library, respectively.
-2. Open the project file `TeamSpeakHasher.vcxproj` with Visual Studio.
-3. Build.
-4. Enjoy.
+1. Install the CUDA Toolkit and build with Visual Studio's CUDA support.
+2. Build.
+3. Enjoy.
    
 ## Usage
 The general usage format is as follows.
