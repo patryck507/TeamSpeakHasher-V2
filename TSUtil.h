@@ -57,14 +57,22 @@ public:
   }
 
   static uint8_t getDifficulty(const std::string& publickey, uint64_t counter) {
-    std::string hashinput;
-    hashinput.reserve(publickey.size() + 32);
-    hashinput.append(publickey);
-    hashinput.append(std::to_string(counter));
+    char counter_buf[21];
+    int len = 0;
+    do {
+      counter_buf[len++] = '0' + (counter % 10);
+      counter /= 10;
+    } while (counter);
+    for (int i = 0, j = len - 1; i < j; ++i, --j) {
+      char c = counter_buf[i];
+      counter_buf[i] = counter_buf[j];
+      counter_buf[j] = c;
+    }
 
     SHA1_CTX ctx;
     sha1_init(&ctx);
-    sha1_update(&ctx, reinterpret_cast<const uint8_t*>(hashinput.data()), hashinput.size());
+    sha1_update(&ctx, reinterpret_cast<const uint8_t*>(publickey.data()), publickey.size());
+    sha1_update(&ctx, reinterpret_cast<const uint8_t*>(counter_buf), len);
     uint8_t hash[SHA1_BLOCK_SIZE];
     sha1_final(&ctx, hash);
 
