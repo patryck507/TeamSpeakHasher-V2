@@ -517,6 +517,10 @@ void TSHasherContext::run_kernel_loop(DeviceContext* dev_ctx) {
       auto dev_startcounter = dev_ctx->tshasherctx->startcounter;
       auto global_max_iterations = std::min((uint64_t)dev_ctx->global_work_size * KERNEL_STD_ITERATIONS,
                                             TSUtil::itsConstantCounterLength(dev_startcounter));
+      if (!TSUtil::isSlowPhase(identity_length, dev_startcounter)) {
+        global_max_iterations = std::min(global_max_iterations,
+                                        TSUtil::itsUntilSlowPhase(identity_length, dev_startcounter));
+      }
       iterations = global_max_iterations / dev_ctx->global_work_size;
       if (iterations == 0) {
         dev_ctx->tshasherctx->startcounter += global_max_iterations;
